@@ -1,0 +1,3 @@
+pyperclip==1.8.0
+PySide2==5.14.2.1
+shiboken2==5.14.2.1

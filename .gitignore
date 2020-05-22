@@ -1,0 +1,5 @@
+venv/
+build.cmd
+build.txt
+resources.qrc
+changelog.txt
