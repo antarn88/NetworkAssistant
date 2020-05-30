@@ -1,4 +1,7 @@
 venv/
+.idea/
+modules/__pycache__/
+utilities/__pycache__/
 build.cmd
 build.txt
 resources.qrc
