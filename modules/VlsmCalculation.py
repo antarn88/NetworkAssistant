@@ -133,11 +133,7 @@ class VlsmCalculation(QWidget):
             column = 0
             for i in subnet.items():
                 value = str(i[1])
-                item = QTableWidgetItem()
-                item.setText(value)
-                item.setFlags(Qt.ItemIsEnabled)
-                item.setTextAlignment(Qt.AlignCenter)
-                self.table.setItem(row, column, item)
+                self.table.setItem(row, column, TableItem(value))
                 column += 1
             row += 1
 
@@ -226,6 +222,14 @@ class VlsmCalculation(QWidget):
                             f"Túl sok állomást szeretnél egy /{self.prefix} főhálózathoz képest!\n"
                             f"Ellenőrizd az adatokat!",
                             self.endpoint_numbers_per_network_input)
+
+
+class TableItem(QTableWidgetItem):
+    def __init__(self, text):
+        super(TableItem, self).__init__(text)
+        self.setText(text)
+        self.setTextAlignment(Qt.AlignCenter)
+        self.setFlags(Qt.ItemIsEnabled)
 
 
 # Copying content of cell to clipboard

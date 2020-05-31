@@ -211,11 +211,7 @@ class CalculationWorker(QThread):
             column = 0
             for i in subnet.items():
                 value = str(i[1])
-                item = QTableWidgetItem()
-                item.setText(value)
-                item.setTextAlignment(Qt.AlignCenter)
-                item.setFlags(Qt.ItemIsEnabled)
-                self.table.setItem(row, column, item)
+                self.table.setItem(row, column, TableItem(value))
                 column += 1
             row += 1
 
@@ -229,6 +225,14 @@ class CalculationWorker(QThread):
             self.inject_data_to_dict()
             self.is_first_network = False
         self.inject_data_to_table()
+
+
+class TableItem(QTableWidgetItem):
+    def __init__(self, text):
+        super(TableItem, self).__init__(text)
+        self.setText(text)
+        self.setTextAlignment(Qt.AlignCenter)
+        self.setFlags(Qt.ItemIsEnabled)
 
 
 # Copying content of cell to clipboard
