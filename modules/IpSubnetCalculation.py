@@ -1,10 +1,10 @@
 from math import log2
 from textwrap import wrap
 
-from PySide2.QtCore import Qt, QThread
+from PySide2.QtCore import Qt, QThread, Signal
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QVBoxLayout, QWidget, QLabel, QGridLayout, QLineEdit, QPushButton, QTableWidget, QHeaderView, \
-    QTableWidgetItem
+    QTableWidgetItem, QProgressBar
 from pyperclip import copy
 
 from utilities.PopupWindow import PopupWindow
@@ -16,7 +16,10 @@ class IpSubnetCalculation(QWidget):
         super(IpSubnetCalculation, self).__init__()
 
         # App attributes
-        self.calculation_worker = None
+        self.network_ip = None
+        self.needed_networks = None
+        self.subnet_bits = None
+        self.default_networkbits = None
 
         main_layout = QVBoxLayout()
         main_layout.setSpacing(10)
@@ -66,41 +69,18 @@ class IpSubnetCalculation(QWidget):
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Stretch)
 
+        # Set table text align of vertical header
+        self.table.verticalHeader().setDefaultAlignment(Qt.AlignCenter)
+
         # Fixed height of table rows
         self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
 
         main_layout.addWidget(self.table)
 
-    def calculation_action(self):
-        self.calculation_worker = CalculationWorker(self)
-        if self.calculation_worker.check_input():
-            self.table.setRowCount(0)
-            self.calculation_worker.start()
-
-
-class CalculationWorker(QThread):
-    def __init__(self, parent):
-        super(CalculationWorker, self).__init__(parent)
-
-        # App attributes
-        self.is_first_network = True
-        self.network_ip = None
-        self.needed_networks = None
-        self.default_networkbits = None
-        self.subnet_bits = None
-        self.prefix = None
-        self.first_addressable_ip = None
-        self.last_addressable_ip = None
-        self.broadcast_ip = None
-        self.subnets = []
-
-        self.starting_network_address_input = parent.starting_network_address_input
-        self.number_of_subnets_input = parent.number_of_subnets_input
-        self.table = parent.table
-        self.table_column_names = parent.table_column_names
-
-    def run(self):
-        self.generating_subnets()
+        # Create progressbar
+        self.progressbar = QProgressBar()
+        self.progressbar.setVisible(False)
+        main_layout.addWidget(self.progressbar)
 
     def check_input(self):
 
@@ -152,6 +132,10 @@ class CalculationWorker(QThread):
         self.needed_networks = self.number_of_subnets_input.text()
         self.subnet_bits = int(log2(int(power_bit_length(int(self.needed_networks)))))
 
+    def get_max_addressable_hosts(self):
+        self.default_networkbits = 32 - get_32bit_format(self.get_starting_network_default_mask()).count("0")
+        return pow(2, ((self.default_networkbits + self.subnet_bits) * "1").ljust(32, "0").count("0")) - 2
+
     def get_starting_network_default_mask(self):
         first_octet = int(self.network_ip.split(".")[0])
 
@@ -161,6 +145,63 @@ class CalculationWorker(QThread):
             return "255.255.0.0"
         elif 192 <= first_octet < 224:
             return "255.255.255.0"
+
+    def calculation_action(self):
+        if self.check_input():
+            self.table.setRowCount(int(self.number_of_subnets_input.text()))
+            self.table.clearContents()
+            self.progressbar.setValue(0)
+            self.progressbar.setMaximum(int(self.number_of_subnets_input.text()) * 6)
+            calculation_worker = CalculationWorker(self)
+            calculation_worker.subnet_item_created.connect(self.subnet_item_created)
+            calculation_worker.calculation_finished.connect(self.calculation_finished)
+            self.progressbar.setVisible(True)
+            calculation_worker.start()
+
+    def subnet_item_created(self, row, column, value):
+        self.table.setItem(row, column, TableItem(value))
+        self.progressbar.setValue(self.progressbar.value() + 1)
+
+    def calculation_finished(self):
+        self.progressbar.setVisible(False)
+        self.progressbar.setValue(0)
+
+
+class CalculationWorker(QThread):
+    subnet_item_created = Signal(int, int, str)
+    calculation_finished = Signal()
+
+    def __init__(self, parent):
+        super(CalculationWorker, self).__init__(parent)
+
+        # App attributes
+        self.is_first_network = True
+        self.prefix = None
+        self.first_addressable_ip = None
+        self.last_addressable_ip = None
+        self.broadcast_ip = None
+        self.subnets = []
+
+        self.network_ip = parent.network_ip
+        self.needed_networks = parent.needed_networks
+        self.subnet_bits = parent.subnet_bits
+        self.default_networkbits = parent.default_networkbits
+        self.get_max_addressable_hosts = parent.get_max_addressable_hosts()
+        self.table_column_names = parent.table_column_names
+
+    def run(self):
+        for subnet in range(int(self.needed_networks)):
+            self.set_network_ip()
+            self.set_first_addressable_ip()
+            self.set_last_addressable_ip()
+            self.set_broadcast_ip()
+            self.inject_data_to_dict()
+            self.is_first_network = False
+            column = 0
+            for subnet_item in self.subnets[subnet].items():
+                self.subnet_item_created.emit(subnet, column, str(subnet_item[1]))
+                column += 1
+        self.calculation_finished.emit()
 
     def get_mask(self):
         mask_32bit = ((self.default_networkbits + self.subnet_bits) * "1").ljust(32, "0")
@@ -182,7 +223,7 @@ class CalculationWorker(QThread):
 
     def set_last_addressable_ip(self):
         bin1 = int(get_32bit_format(self.network_ip), 2)
-        bin2 = int(bin(self.get_max_addressable_hosts()).replace("0b", ""), 2)
+        bin2 = int(bin(self.get_max_addressable_hosts).replace("0b", ""), 2)
         last_addressable_ip_32bit = bin(bin1 + bin2).replace("0b", "").rjust(32, "0")
         self.last_addressable_ip = get_ip_from_32bit_format(last_addressable_ip_32bit)
 
@@ -191,10 +232,6 @@ class CalculationWorker(QThread):
                                  int("1", 2)).replace("0b", "").rjust(32, "0")
         self.broadcast_ip = get_ip_from_32bit_format(broadcast_ip_32bit)
 
-    def get_max_addressable_hosts(self):
-        self.default_networkbits = 32 - get_32bit_format(self.get_starting_network_default_mask()).count("0")
-        return pow(2, ((self.default_networkbits + self.subnet_bits) * "1").ljust(32, "0").count("0")) - 2
-
     def inject_data_to_dict(self):
         self.subnets.append({self.table_column_names[0]: self.network_ip,
                              self.table_column_names[1]: f"{self.first_addressable_ip} - "
@@ -202,34 +239,13 @@ class CalculationWorker(QThread):
                              self.table_column_names[2]: self.broadcast_ip,
                              self.table_column_names[3]: self.get_mask(),
                              self.table_column_names[4]: f"/{self.prefix}",
-                             self.table_column_names[5]: self.get_max_addressable_hosts()})
-
-    def inject_data_to_table(self):
-        row = 0
-        for subnet in self.subnets:
-            self.table.insertRow(row)
-            column = 0
-            for i in subnet.items():
-                value = str(i[1])
-                self.table.setItem(row, column, TableItem(value))
-                column += 1
-            row += 1
-
-    def generating_subnets(self):
-        self.table.setRowCount(0)
-        for subnet in range(int(self.needed_networks)):
-            self.set_network_ip()
-            self.set_first_addressable_ip()
-            self.set_last_addressable_ip()
-            self.set_broadcast_ip()
-            self.inject_data_to_dict()
-            self.is_first_network = False
-        self.inject_data_to_table()
+                             self.table_column_names[5]: self.get_max_addressable_hosts})
 
 
 class TableItem(QTableWidgetItem):
     def __init__(self, text):
         super(TableItem, self).__init__(text)
+
         self.setText(text)
         self.setTextAlignment(Qt.AlignCenter)
         self.setFlags(Qt.ItemIsEnabled)
