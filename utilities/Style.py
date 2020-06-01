@@ -79,6 +79,14 @@ QHeaderView::section {
     border: 1px solid #fffff8;
     font-size: 9pt;
 }
-    
+
+QProgressBar {
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: DodgerBlue;
+}
+
     '''
     return my_style
