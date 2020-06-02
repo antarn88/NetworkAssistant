@@ -1,5 +1,6 @@
 from math import log2
 from textwrap import wrap
+from time import sleep
 
 from PySide2.QtCore import Qt, QThread, Signal
 from PySide2.QtGui import QIcon
@@ -148,19 +149,22 @@ class IpSubnetCalculation(QWidget):
 
     def calculation_action(self):
         if self.check_input():
-            self.table.setRowCount(int(self.number_of_subnets_input.text()))
-            self.table.clearContents()
+            self.table.setRowCount(0)
             self.progressbar.setValue(0)
-            self.progressbar.setMaximum(int(self.number_of_subnets_input.text()) * 6)
+            self.progressbar.setMaximum(int(self.number_of_subnets_input.text()))
             calculation_worker = CalculationWorker(self)
-            calculation_worker.subnet_item_created.connect(self.subnet_item_created)
+            calculation_worker.subnet_calculated.connect(self.subnet_calculated)
             calculation_worker.calculation_finished.connect(self.calculation_finished)
             self.progressbar.setVisible(True)
             calculation_worker.start()
 
-    def subnet_item_created(self, row, column, value):
-        self.table.setItem(row, column, TableItem(value))
-        self.progressbar.setValue(self.progressbar.value() + 1)
+    def subnet_calculated(self, row, subnet):
+        self.table.insertRow(row)
+        column = 0
+        for subnet_item in subnet.items():
+            self.table.setItem(row, column, TableItem(str(subnet_item[1])))
+            column += 1
+        self.progressbar.setValue(row + 1)
 
     def calculation_finished(self):
         self.progressbar.setVisible(False)
@@ -168,7 +172,7 @@ class IpSubnetCalculation(QWidget):
 
 
 class CalculationWorker(QThread):
-    subnet_item_created = Signal(int, int, str)
+    subnet_calculated = Signal(int, dict)
     calculation_finished = Signal()
 
     def __init__(self, parent):
@@ -197,10 +201,12 @@ class CalculationWorker(QThread):
             self.set_broadcast_ip()
             self.inject_data_to_dict()
             self.is_first_network = False
-            column = 0
-            for subnet_item in self.subnets[subnet].items():
-                self.subnet_item_created.emit(subnet, column, str(subnet_item[1]))
-                column += 1
+            self.subnet_calculated.emit(subnet, self.subnets[subnet])
+
+            # Delay for lag-free
+            if len(self.subnets) % 50 == 0:
+                sleep(1)
+
         self.calculation_finished.emit()
 
     def get_mask(self):
