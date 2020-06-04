@@ -5,7 +5,7 @@ from time import sleep
 from PySide2.QtCore import Qt, QThread, Signal
 from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QVBoxLayout, QWidget, QLabel, QGridLayout, QLineEdit, QPushButton, QTableWidget, QHeaderView, \
-    QTableWidgetItem, QProgressBar
+    QTableWidgetItem, QProgressBar, QHBoxLayout
 from pyperclip import copy
 
 from utilities.PopupWindow import PopupWindow
@@ -21,6 +21,7 @@ class IpSubnetCalculation(QWidget):
         self.needed_networks = None
         self.subnet_bits = None
         self.default_networkbits = None
+        self.calculation_worker = None
 
         main_layout = QVBoxLayout()
         main_layout.setSpacing(10)
@@ -78,10 +79,21 @@ class IpSubnetCalculation(QWidget):
 
         main_layout.addWidget(self.table)
 
+        # Bottom bar
+        bottom_bar = QHBoxLayout()
+
         # Create progressbar
         self.progressbar = QProgressBar()
         self.progressbar.setVisible(False)
-        main_layout.addWidget(self.progressbar)
+
+        # Create cancel button
+        self.cancel_btn = QPushButton("Mégse")
+        self.cancel_btn.setVisible(False)
+        self.cancel_btn.clicked.connect(self.terminate_calculation)
+
+        bottom_bar.addWidget(self.progressbar)
+        bottom_bar.addWidget(self.cancel_btn)
+        main_layout.addLayout(bottom_bar)
 
     def check_input(self):
 
@@ -152,11 +164,13 @@ class IpSubnetCalculation(QWidget):
             self.table.setRowCount(0)
             self.progressbar.setValue(0)
             self.progressbar.setMaximum(int(self.number_of_subnets_input.text()))
-            calculation_worker = CalculationWorker(self)
-            calculation_worker.subnet_calculated.connect(self.subnet_calculated)
-            calculation_worker.calculation_finished.connect(self.calculation_finished)
+            self.calculation_worker = CalculationWorker(self)
+            self.calculation_worker.setTerminationEnabled(True)
+            self.calculation_worker.subnet_calculated.connect(self.subnet_calculated)
+            self.calculation_worker.calculation_finished.connect(self.calculation_finished)
             self.progressbar.setVisible(True)
-            calculation_worker.start()
+            self.cancel_btn.setVisible(True)
+            self.calculation_worker.start()
 
     def subnet_calculated(self, row, subnet):
         self.table.insertRow(row)
@@ -168,7 +182,16 @@ class IpSubnetCalculation(QWidget):
 
     def calculation_finished(self):
         self.progressbar.setVisible(False)
+        self.cancel_btn.setVisible(False)
         self.progressbar.setValue(0)
+
+    def terminate_calculation(self):
+        if self.calculation_worker.isRunning():
+            self.calculation_worker.terminate()
+            self.calculation_worker.wait()
+            self.progressbar.setVisible(False)
+            self.cancel_btn.setVisible(False)
+            self.progressbar.setValue(0)
 
 
 class CalculationWorker(QThread):
