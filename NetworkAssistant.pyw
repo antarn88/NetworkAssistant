@@ -18,7 +18,7 @@ class NetworkAssistant(QMainWindow):
         self.resize(950, 600)
 
         # The version of the program
-        version = "1.0.3"
+        version = "1.0.4"
 
         # The title of the program
         self.setWindowTitle(f"Hálózati Segéd {version}")
