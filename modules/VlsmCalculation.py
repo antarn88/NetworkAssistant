@@ -57,7 +57,7 @@ class VlsmCalculation(QWidget):
         top_bar.addWidget(self.endpoint_numbers_per_network_input, 2, 1)
 
         calculation_button = QPushButton("Számítás")
-        calculation_button.setIcon(QIcon("static/icons/get_info.png"))
+        calculation_button.setIcon(QIcon("static/images/get_info.png"))
         calculation_button.clicked.connect(self.calculation_action)
         main_layout.addWidget(calculation_button, alignment=Qt.AlignCenter)
 

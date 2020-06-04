@@ -50,7 +50,7 @@ class IpSubnetCalculation(QWidget):
 
         calculation_button = QPushButton("Számítás")
         calculation_button.clicked.connect(self.calculation_action)
-        calculation_button.setIcon(QIcon("static/icons/get_info.png"))
+        calculation_button.setIcon(QIcon("static/images/get_info.png"))
         main_layout.addWidget(calculation_button, alignment=Qt.AlignCenter)
 
         self.table = QTableWidget()

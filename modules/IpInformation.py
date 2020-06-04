@@ -38,7 +38,7 @@ class IpInformation(QWidget):
         prefix_mask_box_layout.addWidget(self.mask_input, 0, 1)
 
         convert_btn = QPushButton("Konvertálás")
-        convert_btn.setIcon(QIcon("static/icons/exchange.png"))
+        convert_btn.setIcon(QIcon("static/images/exchange.png"))
         convert_btn.clicked.connect(self.convert_action)
         self.prefix_input.returnPressed.connect(self.convert_action)
         self.mask_input.returnPressed.connect(self.convert_action)
@@ -62,7 +62,7 @@ class IpInformation(QWidget):
         ip_information_box_layout.addWidget(self.ip_address_textfield, 0, 1)
 
         get_info_btn = QPushButton("Kérem az infókat!")
-        get_info_btn.setIcon(QIcon("static/icons/get_info.png"))
+        get_info_btn.setIcon(QIcon("static/images/get_info.png"))
         get_info_btn.clicked.connect(self.get_info_action)
         self.ip_address_textfield.returnPressed.connect(self.get_info_action)
         ip_information_box_layout.addWidget(get_info_btn, 0, 2)
@@ -74,7 +74,7 @@ class IpInformation(QWidget):
         self.ip_class_textfield.setAlignment(Qt.AlignCenter)
         ip_information_box_layout.addWidget(self.ip_class_textfield, 1, 1)
         ip_class_copy_btn = QPushButton("Másolás")
-        ip_class_copy_btn.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        ip_class_copy_btn.setIcon(QIcon("static/images/copy_clipboard.png"))
         ip_class_copy_btn.clicked.connect(lambda: copy_action(self.ip_class_textfield.text()))
         ip_information_box_layout.addWidget(ip_class_copy_btn, 1, 2)
 
@@ -85,7 +85,7 @@ class IpInformation(QWidget):
         self.ip_type_textfield.setAlignment(Qt.AlignCenter)
         ip_information_box_layout.addWidget(self.ip_type_textfield, 2, 1)
         ip_type_copy_btn = QPushButton("Másolás")
-        ip_type_copy_btn.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        ip_type_copy_btn.setIcon(QIcon("static/images/copy_clipboard.png"))
         ip_type_copy_btn.clicked.connect(lambda: copy_action(self.ip_type_textfield.text()))
         ip_information_box_layout.addWidget(ip_type_copy_btn, 2, 2)
 
@@ -96,7 +96,7 @@ class IpInformation(QWidget):
         self.network_address_textfield.setAlignment(Qt.AlignCenter)
         ip_information_box_layout.addWidget(self.network_address_textfield, 3, 1)
         network_address_copy_btn = QPushButton("Másolás")
-        network_address_copy_btn.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        network_address_copy_btn.setIcon(QIcon("static/images/copy_clipboard.png"))
         network_address_copy_btn.clicked.connect(lambda: copy_action(self.network_address_textfield.text()))
         ip_information_box_layout.addWidget(network_address_copy_btn, 3, 2)
 
@@ -107,7 +107,7 @@ class IpInformation(QWidget):
         self.subnet_mask_textfield.setAlignment(Qt.AlignCenter)
         ip_information_box_layout.addWidget(self.subnet_mask_textfield, 4, 1)
         subnet_mask_copy_btn = QPushButton("Másolás")
-        subnet_mask_copy_btn.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        subnet_mask_copy_btn.setIcon(QIcon("static/images/copy_clipboard.png"))
         subnet_mask_copy_btn.clicked.connect(lambda: copy_action(self.subnet_mask_textfield.text()))
         ip_information_box_layout.addWidget(subnet_mask_copy_btn, 4, 2)
 
@@ -118,7 +118,7 @@ class IpInformation(QWidget):
         self.first_addressable_ip_textfield.setAlignment(Qt.AlignCenter)
         ip_information_box_layout.addWidget(self.first_addressable_ip_textfield, 5, 1)
         first_addressable_ip_copy_btn = QPushButton("Másolás")
-        first_addressable_ip_copy_btn.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        first_addressable_ip_copy_btn.setIcon(QIcon("static/images/copy_clipboard.png"))
         first_addressable_ip_copy_btn.clicked.connect(lambda: copy_action(self.first_addressable_ip_textfield.text()))
         ip_information_box_layout.addWidget(first_addressable_ip_copy_btn, 5, 2)
 
@@ -129,7 +129,7 @@ class IpInformation(QWidget):
         self.last_addressable_ip_textfield.setAlignment(Qt.AlignCenter)
         ip_information_box_layout.addWidget(self.last_addressable_ip_textfield, 6, 1)
         last_addressable_ip_copy_btn = QPushButton("Másolás")
-        last_addressable_ip_copy_btn.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        last_addressable_ip_copy_btn.setIcon(QIcon("static/images/copy_clipboard.png"))
         last_addressable_ip_copy_btn.clicked.connect(lambda: copy_action(self.last_addressable_ip_textfield.text()))
         ip_information_box_layout.addWidget(last_addressable_ip_copy_btn, 6, 2)
 
@@ -140,7 +140,7 @@ class IpInformation(QWidget):
         self.broadcast_address_textfield.setAlignment(Qt.AlignCenter)
         ip_information_box_layout.addWidget(self.broadcast_address_textfield, 7, 1)
         broadcast_address_copy_btn = QPushButton("Másolás")
-        broadcast_address_copy_btn.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        broadcast_address_copy_btn.setIcon(QIcon("static/images/copy_clipboard.png"))
         broadcast_address_copy_btn.clicked.connect(lambda: copy_action(self.broadcast_address_textfield.text()))
         ip_information_box_layout.addWidget(broadcast_address_copy_btn, 7, 2)
 
@@ -151,7 +151,7 @@ class IpInformation(QWidget):
         self.next_network_address_textfield.setAlignment(Qt.AlignCenter)
         ip_information_box_layout.addWidget(self.next_network_address_textfield, 8, 1)
         next_network_address_copy_btn = QPushButton("Másolás")
-        next_network_address_copy_btn.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        next_network_address_copy_btn.setIcon(QIcon("static/images/copy_clipboard.png"))
         next_network_address_copy_btn.clicked.connect(lambda: copy_action(self.next_network_address_textfield.text()))
         ip_information_box_layout.addWidget(next_network_address_copy_btn, 8, 2)
 
@@ -162,7 +162,7 @@ class IpInformation(QWidget):
         self.max_endpoint_textfield.setAlignment(Qt.AlignCenter)
         ip_information_box_layout.addWidget(self.max_endpoint_textfield, 9, 1)
         max_endpoint_copy_btn = QPushButton("Másolás")
-        max_endpoint_copy_btn.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        max_endpoint_copy_btn.setIcon(QIcon("static/images/copy_clipboard.png"))
         max_endpoint_copy_btn.clicked.connect(lambda: copy_action(self.max_endpoint_textfield.text()))
         ip_information_box_layout.addWidget(max_endpoint_copy_btn, 9, 2)
 

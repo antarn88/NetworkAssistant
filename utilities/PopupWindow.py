@@ -7,7 +7,7 @@ class PopupWindow(QMessageBox):
         super(PopupWindow, self).__init__()
 
         msgbox = self
-        msgbox.setWindowIcon(QIcon("static/icons/main_icon.png"))
+        msgbox.setWindowIcon(QIcon("static/images/main_icon.png"))
         title = "Hálózati Segéd"
 
         if popup_type == "warning":

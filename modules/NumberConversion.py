@@ -52,7 +52,7 @@ class NumberConversion(QWidget):
 
         convert_button = QPushButton("Átváltás")
         convert_button.clicked.connect(self.convert_action)
-        convert_button.setIcon(QIcon("static/icons/exchange.png"))
+        convert_button.setIcon(QIcon("static/images/exchange.png"))
         inputbox_layout.addWidget(convert_button, 1, 1, alignment=Qt.AlignCenter)
 
         # Output
@@ -84,15 +84,15 @@ class NumberConversion(QWidget):
         self.hex_output.setAlignment(Qt.AlignCenter)
 
         bin_output_copy_button = QPushButton("Másolás")
-        bin_output_copy_button.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        bin_output_copy_button.setIcon(QIcon("static/images/copy_clipboard.png"))
         bin_output_copy_button.clicked.connect(lambda: copy_action(self.bin_output.text()))
 
         dec_output_copy_button = QPushButton("Másolás")
-        dec_output_copy_button.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        dec_output_copy_button.setIcon(QIcon("static/images/copy_clipboard.png"))
         dec_output_copy_button.clicked.connect(lambda: copy_action(self.dec_output.text()))
 
         hex_output_copy_button = QPushButton("Másolás")
-        hex_output_copy_button.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        hex_output_copy_button.setIcon(QIcon("static/images/copy_clipboard.png"))
         hex_output_copy_button.clicked.connect(lambda: copy_action(self.hex_output.text()))
 
         outputbox_layout.addWidget(bin_label, 0, 0)
@@ -152,13 +152,13 @@ class NumberConversion(QWidget):
         ip_address_number_conversion_layout.addWidget(self.output_textfield, 1, 1)
 
         output_textfield_copy_button = QPushButton("Másolás")
-        output_textfield_copy_button.setIcon(QIcon("static/icons/copy_clipboard.png"))
+        output_textfield_copy_button.setIcon(QIcon("static/images/copy_clipboard.png"))
         output_textfield_copy_button.clicked.connect(lambda: copy_action(self.output_textfield.text()))
         ip_address_number_conversion_layout.addWidget(output_textfield_copy_button, 1, 2, alignment=Qt.AlignLeft)
 
         convert_button_2 = QPushButton("Átváltás")
         convert_button_2.clicked.connect(self.convert_action_2)
-        convert_button_2.setIcon(QIcon("static/icons/exchange.png"))
+        convert_button_2.setIcon(QIcon("static/images/exchange.png"))
         ip_address_number_conversion_layout.addWidget(convert_button_2, 2, 0, 1, 3, alignment=Qt.AlignHCenter)
 
     def convert_action(self):

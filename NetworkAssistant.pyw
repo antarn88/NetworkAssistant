@@ -24,7 +24,7 @@ class NetworkAssistant(QMainWindow):
         self.setWindowTitle(f"Hálózati Segéd {version}")
 
         # The icon of the program
-        self.setWindowIcon(QIcon("static/icons/main_icon.png"))
+        self.setWindowIcon(QIcon("static/images/main_icon.png"))
 
         # Before using the main layout, need to create a central widget
         central_widget = QWidget()
