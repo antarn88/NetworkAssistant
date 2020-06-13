@@ -7,6 +7,7 @@ from PySide2.QtWidgets import QVBoxLayout, QWidget, QTableWidget, QLabel, QPushB
     QHeaderView
 from pyperclip import copy
 
+from utilities.ManageLng import ManageLng
 from utilities.PopupWindow import PopupWindow
 from utilities.Validator import is_empty, is_correct_network_address, is_correct_endpoint_numbers_per_network, is_correct_prefix
 
@@ -14,6 +15,9 @@ from utilities.Validator import is_empty, is_correct_network_address, is_correct
 class VlsmCalculation(QWidget):
     def __init__(self):
         super(VlsmCalculation, self).__init__()
+
+        # Use language settings
+        self.ml = ManageLng()
 
         # App attributes
         self.network_ip = None
@@ -34,9 +38,9 @@ class VlsmCalculation(QWidget):
         top_bar.setHorizontalSpacing(40)
         main_layout.addLayout(top_bar)
 
-        starting_network_address_label = QLabel("Kiindulási hálózatcím:")
-        endpoint_numbers_per_network_label = QLabel("Végpontszámok a hálózatokban (vesszővel válaszd el őket!):")
-        starting_network_prefix_label = QLabel("Kiindulási hálózat prefixe (opcionális):")
+        self.starting_network_address_label = QLabel(self.ml.get_tr_text("tab_vlsm_starting_net"))
+        self.endpoint_numbers_per_network_label = QLabel(self.ml.get_tr_text("tab_vlsm_endpoint_nums"))
+        self.starting_network_prefix_label = QLabel(self.ml.get_tr_text("tab_vlsm_starting_net_prefix"))
 
         self.starting_network_address_input = QLineEdit()
         self.starting_network_address_input.returnPressed.connect(self.calculation_action)
@@ -47,31 +51,31 @@ class VlsmCalculation(QWidget):
         self.endpoint_numbers_per_network_input = QLineEdit()
         self.endpoint_numbers_per_network_input.returnPressed.connect(self.calculation_action)
 
-        top_bar.addWidget(starting_network_address_label, 0, 0)
+        top_bar.addWidget(self.starting_network_address_label, 0, 0)
         top_bar.addWidget(self.starting_network_address_input, 0, 1)
 
-        top_bar.addWidget(starting_network_prefix_label, 1, 0)
+        top_bar.addWidget(self.starting_network_prefix_label, 1, 0)
         top_bar.addWidget(self.starting_network_prefix_input, 1, 1)
 
-        top_bar.addWidget(endpoint_numbers_per_network_label, 2, 0)
+        top_bar.addWidget(self.endpoint_numbers_per_network_label, 2, 0)
         top_bar.addWidget(self.endpoint_numbers_per_network_input, 2, 1)
 
-        calculation_button = QPushButton("Számítás")
-        calculation_button.setIcon(QIcon("static/images/get_info.png"))
-        calculation_button.clicked.connect(self.calculation_action)
-        main_layout.addWidget(calculation_button, alignment=Qt.AlignCenter)
+        self.calculation_button = QPushButton(self.ml.get_tr_text("tab_vlsm_calc_btn"))
+        self.calculation_button.setIcon(QIcon("static/images/get_info.png"))
+        self.calculation_button.clicked.connect(self.calculation_action)
+        main_layout.addWidget(self.calculation_button, alignment=Qt.AlignCenter)
 
         self.table = QTableWidget()
         self.table.setColumnCount(6)
         self.table.itemDoubleClicked.connect(copy_text_action)
 
         # Set table header labels
-        self.table_column_names = ["Hálózatcím",
-                                   "IP tartomány",
-                                   "Szórási cím",
-                                   "Alhálózati maszk",
-                                   "Prefix",
-                                   "Címezhető host"]
+        self.table_column_names = [self.ml.get_tr_text("table_column_network_add"),
+                                   self.ml.get_tr_text("table_column_ip_range"),
+                                   self.ml.get_tr_text("table_column_broadcast_add"),
+                                   self.ml.get_tr_text("table_column_subnet_mask"),
+                                   self.ml.get_tr_text("table_column_prefix"),
+                                   self.ml.get_tr_text("table_column_addressable_host")]
 
         self.table.setHorizontalHeaderLabels(self.table_column_names)
 
@@ -83,6 +87,9 @@ class VlsmCalculation(QWidget):
         # Fixed height of table rows
         self.table.verticalHeader().setSectionResizeMode(QHeaderView.Fixed)
 
+        # Set table text align of vertical header
+        self.table.verticalHeader().setDefaultAlignment(Qt.AlignCenter)
+
         main_layout.addWidget(self.table)
 
     def check_input(self):
@@ -90,7 +97,7 @@ class VlsmCalculation(QWidget):
         # If the starting network address is empty
         if is_empty(self.starting_network_address_input.text()):
             PopupWindow("warning",
-                        "A kiindulási hálózatcím nem lehet üres!",
+                        self.ml.get_tr_text("tab_vlsm_warning01"),
                         self.starting_network_address_input)
             return False
         else:
@@ -98,14 +105,14 @@ class VlsmCalculation(QWidget):
             # If the starting network address is incorrect
             if not is_correct_network_address(self.starting_network_address_input.text()):
                 PopupWindow("warning",
-                            "Érvénytelen a kiindulási hálózatcím! Ellenőrizd!",
+                            self.ml.get_tr_text("tab_vlsm_warning02"),
                             self.starting_network_address_input)
                 return False
 
         # If endpoint numbers are empty
         if is_empty(self.endpoint_numbers_per_network_input.text()):
             PopupWindow("warning",
-                        "Add meg, hogy hány gépszámú hálózatokat szeretnél!",
+                        self.ml.get_tr_text("tab_vlsm_warning03"),
                         self.endpoint_numbers_per_network_input)
             return False
         else:
@@ -113,7 +120,7 @@ class VlsmCalculation(QWidget):
             # If endpoint numbers are incorrect
             if not is_correct_endpoint_numbers_per_network(self.endpoint_numbers_per_network_input.text()):
                 PopupWindow("warning",
-                            "Érvénytelen a gépszámok megadása! Ellenőrizd!",
+                            self.ml.get_tr_text("tab_vlsm_warning04"),
                             self.endpoint_numbers_per_network_input)
                 return False
 
@@ -121,7 +128,7 @@ class VlsmCalculation(QWidget):
         self.prefix = self.starting_network_prefix_input.text().replace("/", "").replace("\\", "")
         if not is_correct_prefix(self.prefix):
             PopupWindow("warning",
-                        "Érvénytelen a kiindulási hálózat prefixe! Ellenőrizd!",
+                        self.ml.get_tr_text("tab_vlsm_warning05"),
                         self.starting_network_prefix_input)
             return False
         return True
@@ -193,8 +200,7 @@ class VlsmCalculation(QWidget):
                     self.inject_data_to_dict()
                 else:
                     PopupWindow("warning",
-                                "Irreálisan sok állomást szeretnél!\n"
-                                "Ellenőrizd az adatokat!",
+                                self.ml.get_tr_text("tab_vlsm_warning06"),
                                 self.endpoint_numbers_per_network_input)
 
             elif 128 <= first_octet < 192:
@@ -202,8 +208,7 @@ class VlsmCalculation(QWidget):
                     self.inject_data_to_dict()
                 else:
                     PopupWindow("warning",
-                                "Túl sok állomást szeretnél egy 'B' osztályú /16 főhálózathoz képest!\n"
-                                "Próbálkozz inkább egy 'A' osztályú kiindulási hálózattal, vagy egy\nkisebb prefix-szel!",
+                                self.ml.get_tr_text("tab_vlsm_warning07"),
                                 self.endpoint_numbers_per_network_input)
 
             elif 192 <= first_octet < 224:
@@ -211,17 +216,34 @@ class VlsmCalculation(QWidget):
                     self.inject_data_to_dict()
                 else:
                     PopupWindow("warning",
-                                "Túl sok állomást szeretnél egy 'C' osztályú /24 főhálózathoz képest!\n"
-                                "Próbálkozz inkább egy 'B' vagy egy 'A' osztályú kiindulási hálózattal, esetleg kisebb prefix-szel!",
+                                self.ml.get_tr_text("tab_vlsm_warning08"),
                                 self.endpoint_numbers_per_network_input)
         else:
             if sum_all_hosts <= pow(2, 32 - int(self.prefix)):
                 self.inject_data_to_dict()
             else:
+                s1 = self.ml.get_tr_text("tab_vlsm_warning09a")
+                s2 = self.ml.get_tr_text("tab_vlsm_warning09b")
                 PopupWindow("warning",
-                            f"Túl sok állomást szeretnél egy /{self.prefix} főhálózathoz képest!\n"
-                            f"Ellenőrizd az adatokat!",
+                            f"{s1} /{self.prefix} {s2}",
                             self.endpoint_numbers_per_network_input)
+
+    def re_translate_ui(self, lang):
+        self.ml = ManageLng(lang)
+
+        self.starting_network_address_label.setText(self.ml.get_tr_text("tab_vlsm_starting_net"))
+        self.endpoint_numbers_per_network_label.setText(self.ml.get_tr_text("tab_vlsm_endpoint_nums"))
+        self.starting_network_prefix_label.setText(self.ml.get_tr_text("tab_vlsm_starting_net_prefix"))
+        self.calculation_button.setText(self.ml.get_tr_text("tab_vlsm_calc_btn"))
+
+        self.table_column_names = [self.ml.get_tr_text("table_column_network_add"),
+                                   self.ml.get_tr_text("table_column_ip_range"),
+                                   self.ml.get_tr_text("table_column_broadcast_add"),
+                                   self.ml.get_tr_text("table_column_subnet_mask"),
+                                   self.ml.get_tr_text("table_column_prefix"),
+                                   self.ml.get_tr_text("table_column_addressable_host")]
+
+        self.table.setHorizontalHeaderLabels(self.table_column_names)
 
 
 class TableItem(QTableWidgetItem):

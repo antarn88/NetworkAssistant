@@ -8,6 +8,7 @@ from PySide2.QtWidgets import QVBoxLayout, QWidget, QLabel, QGridLayout, QLineEd
     QTableWidgetItem, QProgressBar, QHBoxLayout
 from pyperclip import copy
 
+from utilities.ManageLng import ManageLng
 from utilities.PopupWindow import PopupWindow
 from utilities.Validator import is_empty, is_correct_network_address, is_correct_number_of_subnets
 
@@ -15,6 +16,9 @@ from utilities.Validator import is_empty, is_correct_network_address, is_correct
 class IpSubnetCalculation(QWidget):
     def __init__(self):
         super(IpSubnetCalculation, self).__init__()
+
+        # Use language settings
+        self.ml = ManageLng()
 
         # App attributes
         self.network_ip = None
@@ -35,34 +39,34 @@ class IpSubnetCalculation(QWidget):
         top_bar.setHorizontalSpacing(40)
         main_layout.addLayout(top_bar)
 
-        starting_network_address_label = QLabel("Kiindulási hálózatcím:")
-        number_of_subnets_label = QLabel("Szükséges alhálózatszám:")
+        self.starting_network_address_label = QLabel(self.ml.get_tr_text("tab_ipsubnet_starting_net"))
+        self.number_of_subnets_label = QLabel(self.ml.get_tr_text("tab_ipsubnet_required_subnet_num"))
 
         self.starting_network_address_input = QLineEdit()
         self.starting_network_address_input.returnPressed.connect(self.calculation_action)
         self.number_of_subnets_input = QLineEdit()
         self.number_of_subnets_input.returnPressed.connect(self.calculation_action)
 
-        top_bar.addWidget(starting_network_address_label, 0, 0)
+        top_bar.addWidget(self.starting_network_address_label, 0, 0)
         top_bar.addWidget(self.starting_network_address_input, 0, 1)
-        top_bar.addWidget(number_of_subnets_label, 1, 0)
+        top_bar.addWidget(self.number_of_subnets_label, 1, 0)
         top_bar.addWidget(self.number_of_subnets_input, 1, 1)
 
-        calculation_button = QPushButton("Számítás")
-        calculation_button.clicked.connect(self.calculation_action)
-        calculation_button.setIcon(QIcon("static/images/get_info.png"))
-        main_layout.addWidget(calculation_button, alignment=Qt.AlignCenter)
+        self.calculation_button = QPushButton(self.ml.get_tr_text("tab_ipsubnet_calc_btn"))
+        self.calculation_button.clicked.connect(self.calculation_action)
+        self.calculation_button.setIcon(QIcon("static/images/get_info.png"))
+        main_layout.addWidget(self.calculation_button, alignment=Qt.AlignCenter)
 
         self.table = QTableWidget()
         self.table.itemDoubleClicked.connect(copy_text_action)
         self.table.setColumnCount(6)
 
-        self.table_column_names = ["Hálózatcím",
-                                   "IP tartomány",
-                                   "Szórási cím",
-                                   "Alhálózati maszk",
-                                   "Prefix",
-                                   "Címezhető host"]
+        self.table_column_names = [self.ml.get_tr_text("table_column_network_add"),
+                                   self.ml.get_tr_text("table_column_ip_range"),
+                                   self.ml.get_tr_text("table_column_broadcast_add"),
+                                   self.ml.get_tr_text("table_column_subnet_mask"),
+                                   self.ml.get_tr_text("table_column_prefix"),
+                                   self.ml.get_tr_text("table_column_addressable_host")]
 
         self.table.setHorizontalHeaderLabels(self.table_column_names)
 
@@ -87,7 +91,7 @@ class IpSubnetCalculation(QWidget):
         self.progressbar.setVisible(False)
 
         # Create cancel button
-        self.cancel_btn = QPushButton("Mégse")
+        self.cancel_btn = QPushButton(self.ml.get_tr_text("tab_ipsubnet_cancel_btn"))
         self.cancel_btn.setVisible(False)
         self.cancel_btn.clicked.connect(self.terminate_calculation)
 
@@ -100,7 +104,7 @@ class IpSubnetCalculation(QWidget):
         # If the starting network address is empty
         if is_empty(self.starting_network_address_input.text()):
             PopupWindow("warning",
-                        "A kiindulási hálózatcím nem lehet üres!",
+                        self.ml.get_tr_text("tab_ipsubnet_warning01"),
                         self.starting_network_address_input)
             return False
         else:
@@ -108,14 +112,14 @@ class IpSubnetCalculation(QWidget):
             # If the starting network address is incorrect
             if not is_correct_network_address(self.starting_network_address_input.text()):
                 PopupWindow("warning",
-                            "Érvénytelen a kiindulási hálózatcím! Ellenőrizd!",
+                            self.ml.get_tr_text("tab_ipsubnet_warning02"),
                             self.starting_network_address_input)
                 return False
 
         # If number of subnets is empty
         if is_empty(self.number_of_subnets_input.text()):
             PopupWindow("warning",
-                        "Add meg, hogy hány alhálózatot szeretnél!",
+                        self.ml.get_tr_text("tab_ipsubnet_warning03"),
                         self.number_of_subnets_input)
             return False
         else:
@@ -123,7 +127,7 @@ class IpSubnetCalculation(QWidget):
             # If number of subnets is incorrect
             if not is_correct_number_of_subnets(self.number_of_subnets_input.text()):
                 PopupWindow("warning",
-                            "Érvénytelen az alhálózatszám megadása! Ellenőrizd!",
+                            self.ml.get_tr_text("tab_ipsubnet_warning04"),
                             self.number_of_subnets_input)
                 return False
 
@@ -136,7 +140,7 @@ class IpSubnetCalculation(QWidget):
 
             # Unreal subnet number
             PopupWindow("warning",
-                        "Ennyi alhálózatot nem lehet legenerálni a megadott hálózati címhez!",
+                        self.ml.get_tr_text("tab_ipsubnet_warning05"),
                         self.number_of_subnets_input)
             return False
 
@@ -192,6 +196,23 @@ class IpSubnetCalculation(QWidget):
             self.progressbar.setVisible(False)
             self.cancel_btn.setVisible(False)
             self.progressbar.setValue(0)
+
+    def re_translate_ui(self, lang):
+        self.ml = ManageLng(lang)
+
+        self.starting_network_address_label.setText(self.ml.get_tr_text("tab_ipsubnet_starting_net"))
+        self.number_of_subnets_label.setText(self.ml.get_tr_text("tab_ipsubnet_required_subnet_num"))
+        self.calculation_button.setText(self.ml.get_tr_text("tab_ipsubnet_calc_btn"))
+
+        self.table_column_names = [self.ml.get_tr_text("table_column_network_add"),
+                                   self.ml.get_tr_text("table_column_ip_range"),
+                                   self.ml.get_tr_text("table_column_broadcast_add"),
+                                   self.ml.get_tr_text("table_column_subnet_mask"),
+                                   self.ml.get_tr_text("table_column_prefix"),
+                                   self.ml.get_tr_text("table_column_addressable_host")]
+
+        self.table.setHorizontalHeaderLabels(self.table_column_names)
+        self.cancel_btn.setText(self.ml.get_tr_text("tab_ipsubnet_cancel_btn"))
 
 
 class CalculationWorker(QThread):
