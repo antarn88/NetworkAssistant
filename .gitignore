@@ -1,5 +1,6 @@
 venv/
 .idea/
+__pycache__/
 modules/__pycache__/
 utilities/__pycache__/
 build.cmd
