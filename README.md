@@ -1,2 +1,2 @@
-# HalozatiSeged
-Egy egyszerű IP hálózatszámítási segédprogram
+# NetworkAssistant
+A simple IP networking utility
