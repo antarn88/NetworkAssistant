@@ -1,6 +1,10 @@
 def style():
     my_style = '''
 
+QWidget {
+    font-size: 12px;
+}
+
 QMainWindow {
     background-color: #2a2f38;
 }
@@ -86,6 +90,44 @@ QProgressBar {
 
 QProgressBar::chunk {
     background-color: DodgerBlue;
+}
+
+QRadioButton {    
+    font-size: 11px;
+    padding: 2px;
+}
+
+QRadioButton::indicator:unchecked {
+   width: 7px;
+    height: 7px;
+    left: 1px;
+    margin-right: 1px;
+    background-color: white;
+    border: 2px solid white;
+    border-radius: 5px;
+}
+
+QRadioButton::indicator:unchecked:hover {
+    width: 10px;
+    height: 10px;
+    left: -0.5px;
+    bottom: -1.5px;
+    border: 1px solid rgb(0, 120, 215);
+    border-radius: 5px;    
+}
+
+QRadioButton::indicator:checked {
+    width: 7px;
+    height: 7px;
+    left: 1px;
+    margin-right: 1px;
+    background-color: rgb(51, 51, 51);
+    border: 2px solid white;
+    border-radius: 5px;
+}
+
+QRadioButton::indicator:checked:hover {
+    background-color: rgb(0, 120, 215);
 }
 
     '''

@@ -10,7 +10,6 @@ from utilities.ManageLng import ManageLng
 from utilities.PopupWindow import PopupWindow
 from utilities.Validator import is_empty, is_correct_prefix, is_correct_mask, is_correct_ip_with_prefix
 
-
 class IpInformation(QWidget):
     def __init__(self):
         super(IpInformation, self).__init__()
@@ -23,7 +22,7 @@ class IpInformation(QWidget):
 
         # Prefix-mask-conversion group box
         self.prefix_mask_box = QGroupBox(self.ml.get_tr_text("tab_ip_information_prefix_mask_conv"))
-        self.prefix_mask_box.setMaximumHeight(80)
+        self.prefix_mask_box.setMaximumHeight(90)
         main_layout.addWidget(self.prefix_mask_box, 0, 0)
         prefix_mask_box_layout = QGridLayout()
         prefix_mask_box_layout.setContentsMargins(200, 20, 200, 20)

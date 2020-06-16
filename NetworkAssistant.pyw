@@ -1,7 +1,8 @@
 from sys import argv
 
-from PySide2.QtGui import QIcon
-from PySide2.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QWidget, QTabWidget, QAction
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QIcon, QGuiApplication
+from PySide2.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QWidget, QTabWidget, QAction, QStyle
 
 from modules.IpInformation import IpInformation
 from modules.IpSubnetCalculation import IpSubnetCalculation
@@ -19,10 +20,20 @@ class NetworkAssistant(QMainWindow):
         self.ml = ManageLng()
 
         # The size of the starting window
-        self.resize(950, 600)
+        self.resize(965, 600)
+
+        # Set window center of screen
+        self.setGeometry(
+            QStyle.alignedRect(
+                Qt.LeftToRight,
+                Qt.AlignCenter,
+                self.size(),
+                QGuiApplication.primaryScreen().availableGeometry(),
+            ),
+        )
 
         # The version of the program
-        self.version = "v1.1"
+        self.version = "v1.2"
 
         # The title of the program
         self.setWindowTitle(f"{self.ml.get_tr_text('main_app_title')} {self.version}")
